@@ -1,6 +1,10 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import { CreateAccessToken, CreateRefeshToken } from "../utils/auth.token.js";
+import {
+  CreateAccessToken,
+  CreateRefeshToken,
+  ReadRefreshToken,
+} from "../utils/auth.token.js";
 
 export const RegisterController = async (req, res) => {
   try {
@@ -47,7 +51,7 @@ export const RegisterController = async (req, res) => {
     // ====================================================================================================
     // ====================================================================================================
     res.status(201).json({
-      message: "User registration successfully",
+      message: "User registered successfully",
       data: {
         newuser: {
           email: newuser.email,
@@ -64,3 +68,127 @@ export const RegisterController = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
+
+export const LoginController = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const isExistuser = await User.findOne({ email });
+
+    if (!isExistuser) {
+      return res.status(400).json({
+        message: "Invalid email or password",
+        errors: [{ path: "email", msg: "User not found" }],
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      isExistuser.password,
+    );
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+        errors: [{ path: "password", msg: "Incorrect password" }],
+      });
+    }
+    /*
+  @token utilisation of access and refresh token 
+  @refresh token is on the cookie
+  @access token store in db
+*/
+    const accesstoken = CreateAccessToken({
+      userId: isExistuser._id,
+      role: isExistuser.role,
+    });
+    const refreshtoken = CreateRefeshToken({
+      userId: isExistuser._id,
+      role: isExistuser.role,
+    });
+
+    await User.findOneAndUpdate({ email },
+      {refreshtoken},
+    );
+
+    res.cookie("refreshtoken", refreshtoken, {
+      httpOnly: true,
+    });
+// =================================================================================================
+// =================================================================================================
+    res.status(200).json({
+      message: "Login successful",
+      data: {
+        user: {
+          id: isExistuser._id,
+          email: isExistuser.email,
+          name: isExistuser.name,
+          role: isExistuser.role,
+        },
+        accesstoken,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+export const refresh = async (req, res) => {
+  const refreshToken = req.cookies.refreshtoken;
+  if (!refreshToken) {
+    return res.status(401).json({
+      message: "refresh token is required.",
+    });
+  }
+  try {
+    const decoded = ReadRefreshToken(refreshToken);
+    const { userId, role } = decoded;
+    const user = await User.findByIdAndUpdate(userId);
+
+    if (refreshToken != user.refreshtoken) {
+      await User.findByIdAndUpdate(user._id, {
+        refreshtoken: null,
+      });
+      return res.status(401).json({
+        message: "Refresh token mismatch",
+      });
+    }
+
+    const accessToken = CreateAccessToken({
+      userId,
+      role,
+    });
+
+    const newRefreshToken = CreateRefeshToken({
+      userId,
+      role,
+    });
+
+    await User.findByIdAndUpdate(user._id, {
+      refreshtoken: newRefreshToken,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+    });
+
+    res.status(200).json({
+      message: "Tokens rotated successfully.",
+      data: {
+        user: {
+          email: user.email,
+          name: user.name,
+          id: user._id,
+        },
+        accessToken,
+      },
+    });
+  } catch (error) {
+    return res.status(401).json({
+      message: "Invalid refresh Token",
+    });
+  }
+};
+
+export const getMe = async (req, res) => {};
