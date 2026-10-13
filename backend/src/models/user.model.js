@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "seller"],
       default: "user",
     },
+    refreshtoken:{
+        type:String
+    }
   },
   {
     timestamps: true,
