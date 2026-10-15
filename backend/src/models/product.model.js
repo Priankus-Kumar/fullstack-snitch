@@ -26,44 +26,29 @@ const productSchema = new mongoose.Schema({
       message: "A product can have at most 5 images",
     },
   },
-  price: {
-    amount: {
-      type: Number,
-      required: [true, "Price is required"],
-      min: [0, "Price cannot be negative"],
-      max: [1000000, "Price cannot exceed 1,000,000"],
+  price: [
+    {
+      amount: {
+        type: Number,
+        required: [true, "Price is required"],
+        min: [0, "Price cannot be negative"],
+        max: [1000000, "Price cannot exceed 1,000,000"],
+      },
+      currency: {
+        type: String,
+        required: [true, "Currency is required"],
+        enum: ["USD", "INR"],
+        default: "USD",
+        uppercase: true,
+      },
     },
-    currency: {
-      type: String,
-      required: [true, "Currency is required"],
-      enum: ["USD", "INR"],
-      default: "USD",
-      uppercase: true,
-    },
-  },
+  ],
   sizes: [
     {
       size: {
         type: String,
         required: true,
-        enum: [
-          "XS",
-          "S",
-          "M",
-          "L",
-          "XL",
-          "XXL",
-          "28",
-          "30",
-          "32",
-          "34",
-          "36",
-          "38",
-          "40",
-          "42",
-          "44",
-          "46",
-        ],
+        enum: ["XS", "S", "M", "L", "XL", "XXL"],
       },
       stock: {
         type: Number,
@@ -89,19 +74,18 @@ const Product = mongoose.model("Product", productSchema);
 
 export default Product;
 
-
 /**
- * 
-*.       product :{
-*.       title:"test title 1",
-*.       description:"test description 1",
-*.       images:["https://imagekit.io_1","https://imagekit.io_2"],
-*.       price:{amount:100,currency:"INR"},
-*.       sizes:[
-*.       { size:"M",stock:20 },
-*.       { size:"XL",stock:40}
-*.       ],
-*.       seller: seller_id
-*.       }
- * 
+ *
+ *.       product :{
+ *.       title:"test title 1",
+ *.       description:"test description 1",
+ *.       images:["https://imagekit.io_1","https://imagekit.io_2"],
+ *.       price:{amount:100,currency:"INR"},
+ *.       sizes:[
+ *.       { size:"M",stock:20 },
+ *.       { size:"XL",stock:40}
+ *.       ],
+ *.       seller: seller_id
+ *.       }
+ *
  */

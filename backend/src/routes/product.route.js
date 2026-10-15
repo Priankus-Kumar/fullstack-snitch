@@ -3,7 +3,7 @@ import {
   authenicateSeller,
   authenticate,
 } from "../middleware/auth.middleware.js";
-import { createProductController } from "../controllers/product.controller.js";
+import { AllProductController, createProductController } from "../controllers/product.controller.js";
 import {createProductValidator} from "../utils/product.validator.js"
 /*
  @multer 
@@ -28,5 +28,7 @@ router.post(
   createProductValidator,
   createProductController,
 );
+
+router.get("/all",AllProductController)
 
 export default router;
