@@ -18,7 +18,7 @@ app.use("/api/auth", authRoutes);
 //@product route
 app.use("/api/product", productRoute);
 //@cart route
-app / use("/api/cart", cartRoute);
+app.use("/api/cart", cartRoute);
 // Connect to database
 connectdb();
 

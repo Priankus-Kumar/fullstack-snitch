@@ -5,7 +5,7 @@ import {
 } from "../middleware/auth.middleware.js";
 import { AllProductController, createProductController } from "../controllers/product.controller.js";
 import {createProductValidator} from "../utils/product.validator.js"
-/*
+/** 
  @multer 
  this is the multer code here.
 */
