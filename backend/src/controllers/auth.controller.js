@@ -28,7 +28,7 @@ export const RegisterController = async (req, res) => {
       password: await bcrypt.hash(password, 12),
     });
 
-/*
+    /*
   @token utilisation of access and refresh token 
   @refresh token is on the cookie
   @access token store in db
@@ -105,15 +105,13 @@ export const LoginController = async (req, res) => {
       role: isExistuser.role,
     });
 
-    await User.findOneAndUpdate({ email },
-      {refreshtoken},
-    );
+    await User.findOneAndUpdate({ email }, { refreshtoken });
 
     res.cookie("refreshtoken", refreshtoken, {
       httpOnly: true,
     });
-// =================================================================================================
-// =================================================================================================
+    // =================================================================================================
+    // =================================================================================================
     res.status(200).json({
       message: "Login successful",
       data: {
@@ -192,16 +190,16 @@ export const refresh = async (req, res) => {
 };
 
 export const getMe = async (req, res) => {
-  const {userId,role}=req.user;
-  const user=await User.findById(userId);
+  const { userId, role } = req.user;
+  const user = await User.findById(userId);
   res.status(200).json({
-    message:"User data fetched successfully.",
-    data:{
-         user:{
-          email:user.email,
-          name:user.name,
-          id:user._id
-         }
-    }
-  })
+    message: "User data fetched successfully.",
+    data: {
+      user: {
+        email: user.email,
+        name: user.name,
+        id: user._id,
+      },
+    },
+  });
 };

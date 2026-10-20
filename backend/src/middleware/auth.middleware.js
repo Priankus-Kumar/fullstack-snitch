@@ -7,7 +7,7 @@ export const authenticate = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    console.log("error from the middleware.js",error);
+    console.log("error from the middleware.js", error);
   }
 };
 
