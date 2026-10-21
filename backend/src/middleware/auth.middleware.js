@@ -5,9 +5,11 @@ export const authenticate = (req, res, next) => {
   try {
     const decoded = ReadAccessToken(accessToken);
     req.user = decoded;
-    next();
-  } catch (error) {
-    console.log("error from the middleware.js", error);
+    return next();
+  } catch {
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired access token." });
   }
 };
 

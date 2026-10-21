@@ -57,6 +57,7 @@ export const RegisterController = async (req, res) => {
           email: newuser.email,
           name: newuser.name,
           id: newuser._id,
+          role: newuser.role,
         },
         accesstoken,
       },
@@ -142,12 +143,14 @@ export const refresh = async (req, res) => {
   try {
     const decoded = ReadRefreshToken(refreshToken);
     const { userId, role } = decoded;
-    const user = await User.findByIdAndUpdate(userId);
+    const user = await User.findById(userId);
 
-    if (refreshToken != user.refreshtoken) {
-      await User.findByIdAndUpdate(user._id, {
-        refreshtoken: null,
-      });
+    if (!user || refreshToken !== user.refreshtoken) {
+      if (user) {
+        await User.findByIdAndUpdate(user._id, {
+          refreshtoken: null,
+        });
+      }
       return res.status(401).json({
         message: "Refresh token mismatch",
       });
@@ -167,7 +170,7 @@ export const refresh = async (req, res) => {
       refreshtoken: newRefreshToken,
     });
 
-    res.cookie("refreshToken", newRefreshToken, {
+    res.cookie("refreshtoken", newRefreshToken, {
       httpOnly: true,
     });
 
@@ -178,8 +181,9 @@ export const refresh = async (req, res) => {
           email: user.email,
           name: user.name,
           id: user._id,
+          role: user.role,
         },
-        accessToken,
+        accesstoken: accessToken,
       },
     });
   } catch (error) {
@@ -187,6 +191,26 @@ export const refresh = async (req, res) => {
       message: "Invalid refresh Token",
     });
   }
+};
+
+export const LogoutController = async (req, res) => {
+  const refreshToken = req.cookies.refreshtoken;
+
+  if (refreshToken) {
+    try {
+      const { userId } = ReadRefreshToken(refreshToken);
+      const user = await User.findById(userId);
+      if (user?.refreshtoken === refreshToken) {
+        user.refreshtoken = null;
+        await user.save();
+      }
+    } catch (error) {
+      console.error("Logout token invalidation failed:", error);
+    }
+  }
+
+  res.clearCookie("refreshtoken", { httpOnly: true });
+  res.status(200).json({ message: "Logout successful" });
 };
 
 export const getMe = async (req, res) => {
@@ -199,6 +223,7 @@ export const getMe = async (req, res) => {
         email: user.email,
         name: user.name,
         id: user._id,
+        role: user.role,
       },
     },
   });
