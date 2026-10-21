@@ -5,21 +5,21 @@ const Footer = () => {
 
   const footerLinks = {
     company: [
-      { label: "About Us", href: "/about" },
-      { label: "Careers", href: "/careers" },
-      { label: "Press", href: "/press" },
-      { label: "Blog", href: "/blog" },
+      { label: "About Us", href: "" },
+      { label: "Careers", href: "" },
+      { label: "Press", href: "" },
+      { label: "Blog", href: "" },
     ],
     support: [
-      { label: "Help Center", href: "/help" },
-      { label: "Contact Us", href: "/contact" },
-      { label: "FAQs", href: "/faq" },
-      { label: "Returns", href: "/returns" },
+      { label: "Help Center", href: "" },
+      { label: "Contact Us", href: "" },
+      { label: "FAQs", href: "" },
+      { label: "Returns", href: "" },
     ],
     legal: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" },
-      { label: "Cookie Policy", href: "/cookies" },
+      { label: "Privacy Policy", href: "" },
+      { label: "Terms of Service", href: "" },
+      { label: "Cookie Policy", href: "" },
     ],
     social: [
       { label: "Instagram", href: "https://instagram.com", external: true },
